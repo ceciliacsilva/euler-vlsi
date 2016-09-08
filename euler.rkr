@@ -7,26 +7,6 @@
 
 (define Vdd 'Vdd)
 (define Vss 'Vss)
-
-(define (degree g x)
-  ;;return degree of vertice x
-  (count (lambda(i)
-           (match i
-             [(transistor id (cons e1 e2))
-              (or (equal? x e1) (equal? x e2))]
-             [_ #f])) g))
-
-(define (euler? g)
-  ;;return if the graph has at least one euler-path(0) or euler-circuit(1), else #f
-  (let ((names
-         (remove-duplicates (flatten (map (lambda(i) (transistor-points i)) g)))))
-    (let ((oddq
-           (for/sum ((i (in-list (remove-duplicates (flatten names))))
-                     #:when (odd? (degree g i)))
-             1)))
-      (cond [(= oddq 2) 0];;euler path
-            [(= oddq 0) 1];;euler circuit
-            [else       #f]) ) ))
   
 (define (next? g x)
   ;;return next vertice
@@ -42,13 +22,12 @@
 
 (define (path-start g [pud? #t])
   ;;vertice to begin
-  (let ((op (euler? g))
-        (vertices (remove-duplicates (flatten g))))
-    (cond [(= op 1) ;;euler circuit
-           (if pud Vdd Vss)]
-          [else #f]) ))
+  (if pud? Vdd Vss))
 
-(define (any-path g [vertex (path-start g)])
+(define (euler-path g [pud? #t])
+  (any-path g (path-start g pud?)))
+
+(define (any-path g vertex)
   ;;find path
   (let ((next  (next? g vertex)))
     (if (null? next)
