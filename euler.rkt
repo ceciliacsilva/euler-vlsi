@@ -5,7 +5,7 @@
 
 (require "transistors.rkt")
 
-(provide euler-path path-start)
+(provide euler-path path-start Vdd Vss)
 
 (define Vdd 'Vdd)
 (define Vss 'Vss)

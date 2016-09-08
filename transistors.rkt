@@ -1,6 +1,7 @@
 #lang racket
 
-(provide ordem points transistor make-transistor transistor-id transistor-points link)
+(provide ordem points transistor make-transistor transistor-id transistor-points
+         link link-point link-position)
 
 (define ordem '(S . D))
 
@@ -25,9 +26,9 @@
                               (match (car pud-list)
                                 [(transistor id (cons point1 point2))
                                  (cond [(equal? point1 point)
-                                        (loop (cdr pud-list) (cons (cons point (car ordem)) acc) )]
+                                        (loop (cdr pud-list) (cons (cons id (car ordem)) acc) )]
                                        [(equal? point2 point)
-                                        (loop (cdr pud-list) (cons (cons point (cdr ordem)) acc) )]
+                                        (loop (cdr pud-list) (cons (cons id (cdr ordem)) acc) )]
                                        [else (loop (cdr pud-list) acc)])]
                                 [_ (loop (cdr pud-list) acc)]) )) )) )
           (points-pdn
@@ -38,9 +39,9 @@
                               (match (car pdn-list)
                                 [(transistor id (cons point1 point2))
                                  (cond [(equal? point1 point)
-                                        (loop (cdr pdn-list) (cons (cons point (car ordem)) acc) )]
+                                        (loop (cdr pdn-list) (cons (cons id (car ordem)) acc) )]
                                        [(equal? point2 point)
-                                        (loop (cdr pdn-list) (cons (cons point (cdr ordem)) acc) )]
+                                        (loop (cdr pdn-list) (cons (cons id (cdr ordem)) acc) )]
                                        [else (loop (cdr pdn-list) acc)])]
                                 [_ (loop (cdr pdn-list) acc)]) )) )) ) )
           (values points-pud points-pdn)

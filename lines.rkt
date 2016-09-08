@@ -13,7 +13,7 @@
   (x0 y0 x1 y1 color) #:transparent)
 
 (provide size-janela)
-(define size-janela (make-size-window 800 600))
+(define size-janela (make-size-window 600 800))
 
 (define (polarity pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
@@ -49,35 +49,35 @@
   )
 
 (define line-vdd
-  (let ((pos-y (* 0.1  (size-window-lin size-janela)))
-        (x0    (* 0.05 (size-window-col size-janela)))
-        (x1    (* 0.95 (size-window-col size-janela))))
+  (let ((pos-y (* 0.1  (size-window-col size-janela)))
+        (x0    (* 0.05 (size-window-lin size-janela)))
+        (x1    (* 0.95 (size-window-lin size-janela))))
     (make-line x0 pos-y x1 pos-y "blue")))
 
 (define line-vss
-  (let ((pos-y (* 0.9  (size-window-lin size-janela)))
-        (x0    (* 0.05 (size-window-col size-janela)))
-        (x1    (* 0.95 (size-window-col size-janela))))
+  (let ((pos-y (* 0.9  (size-window-col size-janela)))
+        (x0    (* 0.05 (size-window-lin size-janela)))
+        (x1    (* 0.95 (size-window-lin size-janela))))
     (make-line x0 pos-y x1 pos-y "blue")))
 
 (define line-p-type
-  (let ((pos-y (* 0.3  (size-window-lin size-janela)))
-        (x0    (* 0.05 (size-window-col size-janela)))
-        (x1    (* 0.95 (size-window-col size-janela))))
+  (let ((pos-y (* 0.3  (size-window-col size-janela)))
+        (x0    (* 0.05 (size-window-lin size-janela)))
+        (x1    (* 0.95 (size-window-lin size-janela))))
     (make-line x0 pos-y x1 pos-y "brown")))
 
 (define line-n-type
-  (let ((pos-y (* 0.7  (size-window-lin size-janela)))
-        (x0    (* 0.05 (size-window-col size-janela)))
-        (x1    (* 0.95 (size-window-col size-janela))))
+  (let ((pos-y (* 0.7  (size-window-col size-janela)))
+        (x0    (* 0.05 (size-window-lin size-janela)))
+        (x1    (* 0.95 (size-window-lin size-janela))))
     (make-line x0 pos-y x1 pos-y "green")))
 
 (define (line-poly pud pdn)
   (let-values [((euler1 euler2) (euler-path pud))]
-    (let* ((y0  (* 0.25 (size-window-lin size-janela)))
-           (y1  (* 0.75 (size-window-lin size-janela)))
-           (dis (* 0.1 (size-window-col size-janela)))
-           (div (/ (* 0.8 (size-window-col size-janela)) (length euler2))))
+    (let* ((y0  (* 0.25 (size-window-col size-janela)))
+           (y1  (* 0.75 (size-window-col size-janela)))
+           (dis (* 0.1 (size-window-lin size-janela)))
+           (div (/ (* 0.8 (size-window-lin size-janela)) (length euler2))))
       (for/list ((id (in-list euler2)) (n (in-naturals 1)))
-        (make-line (+ dis (* n div)) y0 (+ dis (* n div)) y1 "red"))) ))
+        (make-line (* n div) y0 (* n div) y1 "red"))) ))
                   
