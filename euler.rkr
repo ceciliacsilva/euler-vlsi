@@ -1,0 +1,68 @@
+#lang racket
+
+;;Cecília Carneiro e Silva
+;;Euler path to vlsi, stick diagrams.
+
+(require "transistors.rkt")
+
+(define Vdd 'Vdd)
+(define Vss 'Vss)
+
+(define (degree g x)
+  ;;return degree of vertice x
+  (count (lambda(i)
+           (match i
+             [(transistor id (cons e1 e2))
+              (or (equal? x e1) (equal? x e2))]
+             [_ #f])) g))
+
+(define (euler? g)
+  ;;return if the graph has at least one euler-path(0) or euler-circuit(1), else #f
+  (let ((names
+         (remove-duplicates (flatten (map (lambda(i) (transistor-points i)) g)))))
+    (let ((oddq
+           (for/sum ((i (in-list (remove-duplicates (flatten names))))
+                     #:when (odd? (degree g i)))
+             1)))
+      (cond [(= oddq 2) 0];;euler path
+            [(= oddq 0) 1];;euler circuit
+            [else       #f]) ) ))
+  
+(define (next? g x)
+  ;;return next vertice
+  (let loop ((graph g) (acc '()))
+    (if (null? graph) acc
+        (let ((i (car graph)))
+          (match i
+            [(transistor id (cons e1 e2))
+             (cond [(equal? e1 x) (loop (cdr graph) (cons (cons id e2) acc))]
+                   [(equal? e2 x) (loop (cdr graph) (cons (cons id e1) acc))]
+                   [else (loop (cdr graph) acc)]) ]
+            [_ acc]) )) ))
+
+(define (path-start g [pud? #t])
+  ;;vertice to begin
+  (let ((op (euler? g))
+        (vertices (remove-duplicates (flatten g))))
+    (cond [(= op 1) ;;euler circuit
+           (if pud Vdd Vss)]
+          [else #f]) ))
+
+(define (any-path g [vertex (path-start g)])
+  ;;find path
+  (let ((next  (next? g vertex)))
+    (if (null? next)
+        (values (list vertex) '())
+        (let ((stack (car next)))
+          (let-values [((euler1 euler2) (any-path (remove-edge vertex stack g) (cdr stack)))]
+            (values (cons vertex      euler1)
+                    (cons (car stack) euler2)))) )) )
+        
+(define (remove-edge point1 edge g)
+  (let ((id     (car edge))
+        (point2 (cdr edge)))
+  (filter-map (lambda(a)
+                (and (not (or (equal? a (make-transistor id (cons point1 point2)))
+                              (equal? a (make-transistor id (cons point2 point1))) )) a ))
+              g) ))
+  
