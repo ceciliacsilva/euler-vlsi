@@ -2,13 +2,18 @@
 
 (require "transistors.rkt" "euler.rkt")
 
+(provide size-window size-window-lin size-window-col line polarity
+         line-x0 line-y0 line-x1 line-y1 line-color make-line
+         line-vdd line-vss line-p-type line-n-type line-poly)
+
 (define-struct size-window
-  (lin col) #:transparent)
+  (col lin) #:transparent)
 
 (define-struct line
   (x0 y0 x1 y1 color) #:transparent)
 
-(define size-janela (make-size-window 100 200))
+(provide size-janela)
+(define size-janela (make-size-window 800 600))
 
 (define (polarity pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
@@ -47,25 +52,25 @@
   (let ((pos-y (* 0.1  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'blue)))
+    (make-line x0 pos-y x1 pos-y "blue")))
 
 (define line-vss
   (let ((pos-y (* 0.9  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'blue)))
+    (make-line x0 pos-y x1 pos-y "blue")))
 
 (define line-p-type
   (let ((pos-y (* 0.3  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'brown)))
+    (make-line x0 pos-y x1 pos-y "brown")))
 
 (define line-n-type
   (let ((pos-y (* 0.7  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'green)))
+    (make-line x0 pos-y x1 pos-y "green")))
 
 (define (line-poly pud pdn)
   (let-values [((euler1 euler2) (euler-path pud))]
@@ -74,5 +79,5 @@
            (dis (* 0.1 (size-window-col size-janela)))
            (div (/ (* 0.8 (size-window-col size-janela)) (length euler2))))
       (for/list ((id (in-list euler2)) (n (in-naturals 1)))
-        (make-line (+ dis (* n div)) y0 (+ dis (* n div)) y1 'red))) ))
+        (make-line (+ dis (* n div)) y0 (+ dis (* n div)) y1 "red"))) ))
                   
