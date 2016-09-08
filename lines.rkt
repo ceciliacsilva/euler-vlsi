@@ -2,6 +2,14 @@
 
 (require "transistors.rkt" "euler.rkt")
 
+(define-struct size-window
+  (lin col) #:transparent)
+
+(define-struct line
+  (x0 y0 x1 y1 color) #:transparent)
+
+(define size-janela (make-size-window 100 200))
+
 (define (polarity pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
                ((euler1 euler2) (euler-path pud))]
@@ -35,6 +43,26 @@
       ))
   )
 
+(define line-vdd
+  (let ((pos-y (* 0.1  (size-window-lin size-janela)))
+        (x0    (* 0.05 (size-window-col size-janela)))
+        (x1    (* 0.95 (size-window-col size-janela))))
+    (make-line x0 pos-y x1 pos-y 'red)))
 
-                      
-  
+(define line-vss
+  (let ((pos-y (* 0.9  (size-window-lin size-janela)))
+        (x0    (* 0.05 (size-window-col size-janela)))
+        (x1    (* 0.95 (size-window-col size-janela))))
+    (make-line x0 pos-y x1 pos-y 'red)))
+
+(define line-p-type
+  (let ((pos-y (* 0.3  (size-window-lin size-janela)))
+        (x0    (* 0.05 (size-window-col size-janela)))
+        (x1    (* 0.95 (size-window-col size-janela))))
+    (make-line x0 pos-y x1 pos-y 'brown)))
+
+(define line-n-type
+  (let ((pos-y (* 0.7  (size-window-lin size-janela)))
+        (x0    (* 0.05 (size-window-col size-janela)))
+        (x1    (* 0.95 (size-window-col size-janela))))
+    (make-line x0 pos-y x1 pos-y 'green)))
