@@ -1,8 +1,8 @@
 #lang racket
 
-(provide polarity points transistor make-transistor transistor-id transistor-points link)
+(provide ordem points transistor make-transistor transistor-id transistor-points link)
 
-(define polarity '(S . D))
+(define ordem '(S . D))
 
 (define-struct transistor
   (id points) #:transparent)
@@ -25,22 +25,22 @@
                               (match (car pud-list)
                                 [(transistor id (cons point1 point2))
                                  (cond [(equal? point1 point)
-                                        (loop (cdr pud-list) (cons (cons point (car polarity)) acc) )]
+                                        (loop (cdr pud-list) (cons (cons point (car ordem)) acc) )]
                                        [(equal? point2 point)
-                                        (loop (cdr pud-list) (cons (cons point (cdr polarity)) acc) )]
+                                        (loop (cdr pud-list) (cons (cons point (cdr ordem)) acc) )]
                                        [else (loop (cdr pud-list) acc)])]
                                 [_ (loop (cdr pud-list) acc)]) )) )) )
           (points-pdn
            (for/list ((point (in-list pdn-names)))
              (make-link point
-                        (let loop [(pdn-list pud) (acc '())]
+                        (let loop [(pdn-list pdn) (acc '())]
                           (if (null? pdn-list) acc
                               (match (car pdn-list)
                                 [(transistor id (cons point1 point2))
                                  (cond [(equal? point1 point)
-                                        (loop (cdr pdn-list) (cons (cons point (car polarity)) acc) )]
+                                        (loop (cdr pdn-list) (cons (cons point (car ordem)) acc) )]
                                        [(equal? point2 point)
-                                        (loop (cdr pdn-list) (cons (cons point (cdr polarity)) acc) )]
+                                        (loop (cdr pdn-list) (cons (cons point (cdr ordem)) acc) )]
                                        [else (loop (cdr pdn-list) acc)])]
                                 [_ (loop (cdr pdn-list) acc)]) )) )) ) )
           (values points-pud points-pdn)

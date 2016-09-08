@@ -5,6 +5,8 @@
 
 (require "transistors.rkt")
 
+(provide euler-path path-start)
+
 (define Vdd 'Vdd)
 (define Vss 'Vss)
   
@@ -31,11 +33,12 @@
   ;;find path
   (let ((next  (next? g vertex)))
     (if (null? next)
-        (values (list vertex) '())
-        (let ((stack (car next)))
+        (values '() '())
+        (let* ((stack (car next))
+               (id    (car stack)))
           (let-values [((euler1 euler2) (any-path (remove-edge vertex stack g) (cdr stack)))]
-            (values (cons vertex      euler1)
-                    (cons (car stack) euler2)))) )) )
+            (values (cons (make-transistor id (cons vertex (cdr stack)))  euler1)
+                    (cons id euler2)))) )) )
         
 (define (remove-edge point1 edge g)
   (let ((id     (car edge))
