@@ -47,13 +47,13 @@
   (let ((pos-y (* 0.1  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'red)))
+    (make-line x0 pos-y x1 pos-y 'blue)))
 
 (define line-vss
   (let ((pos-y (* 0.9  (size-window-lin size-janela)))
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
-    (make-line x0 pos-y x1 pos-y 'red)))
+    (make-line x0 pos-y x1 pos-y 'blue)))
 
 (define line-p-type
   (let ((pos-y (* 0.3  (size-window-lin size-janela)))
@@ -66,3 +66,13 @@
         (x0    (* 0.05 (size-window-col size-janela)))
         (x1    (* 0.95 (size-window-col size-janela))))
     (make-line x0 pos-y x1 pos-y 'green)))
+
+(define (line-poly pud pdn)
+  (let-values [((euler1 euler2) (euler-path pud))]
+    (let* ((y0  (* 0.25 (size-window-lin size-janela)))
+           (y1  (* 0.75 (size-window-lin size-janela)))
+           (dis (* 0.1 (size-window-col size-janela)))
+           (div (/ (* 0.8 (size-window-col size-janela)) (length euler2))))
+      (for/list ((id (in-list euler2)) (n (in-naturals 1)))
+        (make-line (+ dis (* n div)) y0 (+ dis (* n div)) y1 'red))) ))
+                  
