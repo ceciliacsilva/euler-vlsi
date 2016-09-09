@@ -80,7 +80,6 @@
                  (send dc draw-line (- (* no-num div) (/ div 2)) y0 (- (* no-num div) (/ div 2)) y1)
                  (send dc draw-line (+ (* no-num div) (/ div 2)) y0 (+ (* no-num div) (/ div 2)) y1)) )]
           [_ #f]))
-      
       )
     )
   )

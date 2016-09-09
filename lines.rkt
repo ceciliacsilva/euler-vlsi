@@ -48,36 +48,37 @@
       ))
   )
 
-(define line-vdd
-  (let ((pos-y (* 0.1  (size-window-col size-janela)))
-        (x0    (* 0.05 (size-window-lin size-janela)))
-        (x1    (* 0.95 (size-window-lin size-janela))))
-    (make-line x0 pos-y x1 pos-y "blue")))
+(define (line-hor pud pdn)
+  (let-values [((points-pud points-pdn) (points pud pdn))
+               ((euler1 euler2) (euler-path pud))]
+    (let ((line-pud (length points-pud))
+          (line-pdn (length points-pdn)))
+      (let ((y2 (/ (* 0.4 (size-window-lin size-janela)) line-pud))
+            (y3 (/ (* 0.4 (size-window-lin size-janela)) line-pdn))
+            (x0 (* 0.1 (size-window-col size-janela)))
+            (x1 (* 0.9 (size-window-col size-janela))))
+        (values
+         (for/list ((a (in-list points-pud))(i (in-naturals 1)))
+           (let ((id (link-point a)) (color "black"))
+             (cond [(or (equal? id Vdd) (equal? id Vss)) (set! color "blue")]
+                   [(equal? id Vout) (set! color "brown")]
+                   [else (set! color "blue")])
+             (make-line x0 (* i y2) x1 (* i y2) color)))
+         (for/list ((a (in-list points-pdn))(i (in-naturals 1)))
+           (let ((y (- (size-window-lin size-janela) (* i y3))))
+             (let ((id (link-point a)) (color "black"))
+               (cond [(or (equal? id Vdd) (equal? id Vss)) (set! color "blue")]
+                     [(equal? id Vout) (set! color "green")]
+                     [else (set! color "blue")])
+               (make-line x0 y x1 y color))) )) )) ))
 
-(define line-vss
-  (let ((pos-y (* 0.9  (size-window-col size-janela)))
-        (x0    (* 0.05 (size-window-lin size-janela)))
-        (x1    (* 0.95 (size-window-lin size-janela))))
-    (make-line x0 pos-y x1 pos-y "blue")))
-
-(define line-p-type
-  (let ((pos-y (* 0.3  (size-window-col size-janela)))
-        (x0    (* 0.05 (size-window-lin size-janela)))
-        (x1    (* 0.95 (size-window-lin size-janela))))
-    (make-line x0 pos-y x1 pos-y "brown")))
-
-(define line-n-type
-  (let ((pos-y (* 0.7  (size-window-col size-janela)))
-        (x0    (* 0.05 (size-window-lin size-janela)))
-        (x1    (* 0.95 (size-window-lin size-janela))))
-    (make-line x0 pos-y x1 pos-y "green")))
-
-(define (line-poly pud pdn)
-  (let-values [((euler1 euler2) (euler-path pud))]
-    (let* ((y0  (* 0.25 (size-window-col size-janela)))
-           (y1  (* 0.75 (size-window-col size-janela)))
-           (dis (* 0.1 (size-window-lin size-janela)))
-           (div (/ (* 0.8 (size-window-lin size-janela)) (length euler2))))
-      (for/list ((id (in-list euler2)) (n (in-naturals 1)))
-        (make-line (* n div) y0 (* n div) y1 "red"))) ))
-                  
+(define (line-ver pud pdn)
+  (let-values [((points-pud points-pdn) (points pud pdn))
+               ((euler1 euler2) (euler-path pud))]
+    (let* ((qnt-con (length euler2))
+           (x  (/ (* 0.8 (size-window-lin size-janela)) qnt-con))
+           (y0 (* 0.3 (size-window-lin size-janela)))
+           (y1 (* 0.7 (size-window-lin size-janela))))
+      (for/list ((i (in-range 1 (+ 1 qnt-con))))
+        (make-line (* i x) y0 (* i x) y1 "red"))) ))
+         
