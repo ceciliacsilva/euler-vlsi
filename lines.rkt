@@ -3,8 +3,7 @@
 (require "transistors.rkt" "euler.rkt")
 
 (provide size-window size-window-lin size-window-col line polarity
-         line-x0 line-y0 line-x1 line-y1 line-color make-line
-         line-vdd line-vss line-p-type line-n-type line-poly)
+         line-x0 line-y0 line-x1 line-y1 line-color make-line line-ver line-hor)
 
 (define-struct size-window
   (col lin) #:transparent)
@@ -53,32 +52,35 @@
                ((euler1 euler2) (euler-path pud))]
     (let ((line-pud (length points-pud))
           (line-pdn (length points-pdn)))
-      (let ((y2 (/ (* 0.4 (size-window-lin size-janela)) line-pud))
-            (y3 (/ (* 0.4 (size-window-lin size-janela)) line-pdn))
-            (x0 (* 0.1 (size-window-col size-janela)))
-            (x1 (* 0.9 (size-window-col size-janela))))
+      (let ((y2 (/ (* 0.3 (size-window-col size-janela)) line-pud))
+            (y3 (/ (* 0.3 (size-window-col size-janela)) line-pdn))
+            (x0 (* 0 (size-window-lin size-janela)))
+            (x1 (* 1 (size-window-lin size-janela))))
         (values
          (for/list ((a (in-list points-pud))(i (in-naturals 1)))
            (let ((id (link-point a)) (color "black"))
              (cond [(or (equal? id Vdd) (equal? id Vss)) (set! color "blue")]
                    [(equal? id Vout) (set! color "brown")]
                    [else (set! color "blue")])
-             (make-line x0 (* i y2) x1 (* i y2) color)))
+             (list id (make-line x0 (* i y2) x1 (* i y2) color))))
          (for/list ((a (in-list points-pdn))(i (in-naturals 1)))
-           (let ((y (- (size-window-lin size-janela) (* i y3))))
+           (let ((y (- (size-window-col size-janela) (* i y3))))
              (let ((id (link-point a)) (color "black"))
                (cond [(or (equal? id Vdd) (equal? id Vss)) (set! color "blue")]
                      [(equal? id Vout) (set! color "green")]
                      [else (set! color "blue")])
-               (make-line x0 y x1 y color))) )) )) ))
+               (list id (make-line x0 y x1 y color)))) )) )) ))
 
 (define (line-ver pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
-               ((euler1 euler2) (euler-path pud))]
+               ((euler1 euler2) (euler-path pud))
+               ((polarity-pud polarity-pdn) (polarity pud pdn))]
     (let* ((qnt-con (length euler2))
            (x  (/ (* 0.8 (size-window-lin size-janela)) qnt-con))
-           (y0 (* 0.3 (size-window-lin size-janela)))
-           (y1 (* 0.7 (size-window-lin size-janela))))
-      (for/list ((i (in-range 1 (+ 1 qnt-con))))
-        (make-line (* i x) y0 (* i x) y1 "red"))) ))
+           (y0 (* 0.2 (size-window-col size-janela)))
+           (y1 (* 0.8 (size-window-col size-janela))))
+      (for/list ((id (in-list euler2)) (i (in-naturals 1)))
+        (list id (cadr (assoc id polarity-pud))
+              (cadr (assoc id polarity-pdn))
+              (make-line (* i x) y0 (* i x) y1 "red"))) )))
          

@@ -5,11 +5,9 @@
 
 (require "transistors.rkt")
 
-(provide euler-path path-start Vdd Vss Vout)
+(provide euler-path path-start)
 
-(define Vdd  'Vdd)
-(define Vss  'Vss)
-(define Vout 'Out)
+
   
 (define (next? g x)
   ;;return next vertice

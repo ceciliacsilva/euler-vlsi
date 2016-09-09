@@ -1,9 +1,13 @@
 #lang racket
 
 (provide ordem points transistor make-transistor transistor-id transistor-points
-         link link-point link-position)
+         link link-point link-position Vss Vdd Vout)
 
 (define ordem '(S . D))
+
+(define Vdd  'Vdd)
+(define Vss  'Vss)
+(define Vout 'Out)
 
 (define-struct transistor
   (id points) #:transparent)
@@ -44,9 +48,29 @@
                                         (loop (cdr pdn-list) (cons (cons id (cdr ordem)) acc) )]
                                        [else (loop (cdr pdn-list) acc)])]
                                 [_ (loop (cdr pdn-list) acc)]) )) )) ) )
-          (values points-pud points-pdn)
+      (let* ((first-ele   (first points-pud))
+             (vdd-ele     (car (filter-map
+                                (lambda(a) (and (equal? (link-point a) Vdd) a)) points-pud)))
+             (vdd-index   (index-of points-pud vdd-ele))
+             (first-ele-n (first points-pdn))
+             (vss-ele     (car (filter-map
+                              (lambda(a) (and (equal? (link-point a) Vss) a)) points-pdn)))
+             (vss-index (index-of points-pdn vss-ele)))
+        (let* ((pud-1 (list-set points-pud 0 vdd-ele))
+               (pud-2 (list-set pud-1 vdd-index first-ele))
+               (pdn-1 (list-set points-pdn 0 vss-ele))
+               (pdn-2 (list-set pdn-1 vss-index first-ele-n)))
+          (values pud-2 pdn-2) ))
     ))
   )
+
+(define (index-of l x)
+  (cond
+    [(list? l)
+         (for/or ([y l] [i (in-naturals)] #:when (equal? x y)) i)]
+    [(pair? l)
+         (if (equal? (car l) x) 0
+             1)]))
 
 ;;pud e pdn tests
 (provide pud pdn)
