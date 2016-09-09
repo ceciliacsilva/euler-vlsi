@@ -28,7 +28,7 @@
             (* 0.5 (size-window-col size-janela)))
 
       (draw-other-id line-pud euler2 points-pud line-id x y-p-type)
-      (draw-other-id line-pdn euler2 points-pdn line-id x y-n-type)
+      (draw-other-id line-pdn euler2 points-pdn line-id x y-n-type #f)
 
       (for ((i (in-list line-id)))
         (match i
@@ -102,11 +102,10 @@
               (let ((nos (car (filter-map
                                (lambda(i) (and (equal? (link-point i) id) (link-position i)))
                                points-pud))))
-                ;(displayln nos)
                 (for ((j (in-list nos)))
                   (match (assoc (car j) line-id)
                     [(list _ p-pol n-pol (line x1 y0 x1 y1 _))
-                     (cond [(not pud?) (set! p-pol  n-pol)])
+                     (cond [(not pud?) (set! p-pol n-pol)])
                      (send dc set-pen "blue" 2 'solid)
                      (send dc set-brush "blue" 'solid)
                      (send dc set-smoothing 'smoothed)
