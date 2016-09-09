@@ -7,8 +7,6 @@
 
 (provide euler-path path-start)
 
-
-  
 (define (next? g x)
   ;;return next vertice
   (let loop ((graph g) (acc '()))
@@ -33,11 +31,14 @@
   (let ((next  (next? g vertex)))
     (if (null? next)
         (values '() '())
-        (let* ((stack (car next))
-               (id    (car stack)))
-          (let-values [((euler1 euler2) (any-path (remove-edge vertex stack g) (cdr stack)))]
-            (values (cons (make-transistor id (cons vertex (cdr stack)))  euler1)
-                    (cons id euler2)))) )) )
+        (let ((nth-rand (random (length '(1);next
+                                        ))))
+          (let* ((stack (list-ref next nth-rand))
+                 (id    (car stack)))
+            ;;(displayln (~a stack "   " id))
+            (let-values [((euler1 euler2) (any-path (remove-edge vertex stack g) (cdr stack)))]
+              (values (cons (make-transistor id (cons vertex (cdr stack)))  euler1)
+                      (cons id euler2)))) )) ))
         
 (define (remove-edge point1 edge g)
   (let ((id     (car edge))

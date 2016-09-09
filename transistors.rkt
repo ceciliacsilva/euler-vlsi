@@ -48,21 +48,33 @@
                                         (loop (cdr pdn-list) (cons (cons id (cdr ordem)) acc) )]
                                        [else (loop (cdr pdn-list) acc)])]
                                 [_ (loop (cdr pdn-list) acc)]) )) )) ) )
-      (let* ((first-ele   (first points-pud))
-             (vdd-ele     (car (filter-map
-                                (lambda(a) (and (equal? (link-point a) Vdd) a)) points-pud)))
-             (vdd-index   (index-of points-pud vdd-ele))
-             (first-ele-n (first points-pdn))
-             (vss-ele     (car (filter-map
-                              (lambda(a) (and (equal? (link-point a) Vss) a)) points-pdn)))
-             (vss-index (index-of points-pdn vss-ele)))
-        (let* ((pud-1 (list-set points-pud 0 vdd-ele))
-               (pud-2 (list-set pud-1 vdd-index first-ele))
-               (pdn-1 (list-set points-pdn 0 vss-ele))
-               (pdn-2 (list-set pdn-1 vss-index first-ele-n)))
-          (values pud-2 pdn-2) ))
+      (let* ((vdd-ele (car (filter-map
+                            (lambda(a) (and (equal? (link-point a) Vdd) a)) points-pud)))
+             (vdd-index  (index-of points-pud vdd-ele))
+             (vss-ele (car (filter-map
+                            (lambda(a) (and (equal? (link-point a) Vss) a)) points-pdn)))
+             (vss-index  (index-of points-pdn vss-ele))
+             (pud-2 (list-swap points-pud vdd-index 0))
+             (pdn-2 (list-swap points-pdn vss-index 0))
+             (vout1-ele   (car (filter-map
+                                (lambda(a) (and (equal? (link-point a) Vout) a)) pud-2)))
+             (vout1-index (index-of pud-2 vout1-ele))
+             (vout2-ele   (car (filter-map
+                                (lambda(a) (and (equal? (link-point a) Vout) a)) pdn-2)))
+             (vout2-index (index-of pdn-2 vout2-ele))
+             (pud-3 (list-swap pud-2 vout1-index (round (/ (length points-pud) 2))))
+             (pdn-3 (list-swap pdn-2 vout2-index (round (/ (length points-pdn) 2)))))
+        (values pud-3 pdn-3) )
     ))
   )
+
+(define (list-swap list1 n1 n2)
+  (let* ((ele1 (list-ref list1 n1))
+         (ele2 (list-ref list1 n2))
+         (n-list (list-set list1 n1 ele2))
+         (f-list (list-set n-list n2 ele1)))
+    f-list))
+    
 
 (define (index-of l x)
   (cond
@@ -78,3 +90,4 @@
                   (make-transistor 'E '(P2 . P1)) (make-transistor 'B '(Out . P2)) (make-transistor 'C '(Out . P2))))
 (define pdn (list (make-transistor 'A '(Out . P3)) (make-transistor 'D '(P3 . Vss))
                   (make-transistor 'E '(P3 . Vss)) (make-transistor 'B '(Out . P4)) (make-transistor 'C '(P4 . Vss))))
+

@@ -3,7 +3,8 @@
 (require "transistors.rkt" "euler.rkt")
 
 (provide size-window size-window-lin size-window-col line polarity
-         line-x0 line-y0 line-x1 line-y1 line-color make-line line-ver line-hor)
+         line-x0 line-y0 line-x1 line-y1 line-color make-line
+         line-ver line-hor line-vout)
 
 (define-struct size-window
   (col lin) #:transparent)
@@ -83,4 +84,13 @@
         (list id (cadr (assoc id polarity-pud))
               (cadr (assoc id polarity-pdn))
               (make-line (* i x) y0 (* i x) y1 "red"))) )))
+
+(define (line-vout)
+  (list
+   (make-line
+    (* 0.1 (size-window-lin size-janela))
+    (* 0.5 (size-window-col size-janela))
+    (* 0.9 (size-window-lin size-janela))
+    (* 0.5 (size-window-col size-janela))
+    "blue")))
          
