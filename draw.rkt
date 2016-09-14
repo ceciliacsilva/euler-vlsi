@@ -6,11 +6,6 @@
 ;;> (draw-stick-basic pud pdn)
 ;;> stick-diagram
 
-(define pud2 (list (make-transistor 'A '(P1 . Vdd)) (make-transistor 'B '(P1 . Vdd))
-                   (make-transistor 'E '(P2 . P1)) (make-transistor 'D '(Out . P2)) (make-transistor 'C '(Out . P2))))
-(define pdn2 (list (make-transistor 'A '(Out . P3)) (make-transistor 'B '(P3 . Vss))
-                   (make-transistor 'E '(Out . Vss)) (make-transistor 'D '(Out . P4)) (make-transistor 'C '(P4 . Vss))))
-
 (define stick-diagram (make-bitmap (size-window-lin size-janela) (size-window-col size-janela)))
 
 (define dc

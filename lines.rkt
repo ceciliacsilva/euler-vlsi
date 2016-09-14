@@ -17,40 +17,46 @@
 
 (define (polarity pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
-               ((euler1 euler2) (euler-path pud))]
-    (let ((polarity-pud
-           (for/list ((point (in-list euler1)))
-             (match point
-               [(transistor id _)
-                (let ((point-euler
-                       (car (filter-map (lambda(a) (and (equal? (transistor-id a) id) a)) pud))))
-                  (if (equal? point point-euler)
-                      (cons id (list ordem))
-                      (cons id (list (cons (cdr ordem) (car ordem)))))
-                  )] )) )
-          (polarity-pdn
-           (let loop ((ids euler2) (point (path-start pdn #f)) (acc '()))
-             (if (null? ids) (reverse acc)
-                 (let ((id (car ids)))
-                   (let ((pdn-element
-                          (car (filter-map
-                                (lambda(a) (and (equal? (transistor-id a) id) a)) pdn))))
-               (match pdn-element
-                 [(transistor _ (cons p1 p2))
-                  (cond [(equal? p1 point)
-                         (loop (cdr ids) p2 (cons (cons id (list ordem)) acc))]
-                        [(equal? p2 point)
-                         (loop (cdr ids) p1
-                               (cons (cons id (list (cons (cdr ordem) (car ordem)))) acc))]
-                        [else (loop (cdr ids) point acc)])]
-                 [_ (loop (cdr ids) point acc)]) )) ))) )
-      (values polarity-pud polarity-pdn)
-      ))
+               ((euler1 euler2) (euler-path pud pdn))
+               ((no-start pud?) (path-start pud pdn))]
+    (if pud? (values (polarity-euler euler1 pud)
+                     (polarity-n-euler euler2 pdn))
+        (values (polarity-n-euler euler2 pud)
+                (polarity-euler euler1 pdn))
+        )
+    )
   )
+
+(define (polarity-euler euler1 g)
+  (for/list ((euler-transistor (in-list euler1)))
+    (match euler-transistor
+      [(transistor id pol)
+       (let ((pol-g (transistor-points (filter-transistor id g))))
+         (if (equal? pol pol-g)
+             (list id ordem)
+             (list id (cons (cdr ordem) (car ordem)))) )]) ))
+
+(define (polarity-n-euler euler2 g)
+  (let loop ((ids (append euler2 (list (car euler2))))
+             (acc '()))
+    (cond [(not (null? (cdr ids)))
+           (let* ((id         (car ids))
+                  (id-next    (cadr ids))
+                  (trans      (filter-transistor id g))
+                  (trans-next (filter-transistor id-next g)))
+             (let ((e1 (car (transistor-points trans)))
+                   (e2 (cdr (transistor-points trans)))
+                   (po (transistor-points trans-next)))
+               (if (or (equal? e1 (car po)) (equal? e1 (cdr po)))
+                   (loop (cdr ids) (cons (list id (cons (cdr ordem) (car ordem))) acc))
+                   (loop (cdr ids) (cons (list id ordem) acc))) )) ]
+          [else (reverse acc)]) ))
+             
+      
 
 (define (line-hor pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
-               ((euler1 euler2) (euler-path pud))]
+               ((euler1 euler2) (euler-path pud pdn))]
     (let ((line-pud (length points-pud))
           (line-pdn (length points-pdn)))
       (let ((y2 (/ (* 0.3 (size-window-col size-janela)) line-pud))
@@ -74,7 +80,7 @@
 
 (define (line-ver pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
-               ((euler1 euler2) (euler-path pud))
+               ((euler1 euler2) (euler-path pud pdn))
                ((polarity-pud polarity-pdn) (polarity pud pdn))]
     (let* ((qnt-con (length euler2))
            (x  (/ (* 0.8 (size-window-lin size-janela)) qnt-con))
@@ -93,4 +99,4 @@
     (* 0.9 (size-window-lin size-janela))
     (* 0.5 (size-window-col size-janela))
     "blue")))
-         
+

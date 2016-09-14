@@ -1,8 +1,6 @@
 #lang racket
 
-(provide ordem points transistor make-transistor transistor-id transistor-points
-         link link-point link-position Vss Vdd Vout)
-
+(provide (all-defined-out))
 (define ordem '(S . D))
 
 (define Vdd  'Vdd)
@@ -68,6 +66,10 @@
     ))
   )
 
+(define (filter-transistor id g)
+  (car (filter-map
+        (lambda(a) (and (equal? (transistor-id a) id) a)) g)))
+  
 (define (list-swap list1 n1 n2)
   (let* ((ele1 (list-ref list1 n1))
          (ele2 (list-ref list1 n2))
@@ -90,4 +92,12 @@
                   (make-transistor 'E '(P2 . P1)) (make-transistor 'B '(Out . P2)) (make-transistor 'C '(Out . P2))))
 (define pdn (list (make-transistor 'A '(Out . P3)) (make-transistor 'D '(P3 . Vss))
                   (make-transistor 'E '(P3 . Vss)) (make-transistor 'B '(Out . P4)) (make-transistor 'C '(P4 . Vss))))
+
+;pud2 pdn2
+(provide pud2 pdn2)
+(define pud2 (list (make-transistor 'A '(P1 . Vdd)) (make-transistor 'B '(P1 . Vdd))
+                   (make-transistor 'E '(P2 . P1)) (make-transistor 'D '(Out . P2)) (make-transistor 'C '(Out . P2))))
+(define pdn2 (list (make-transistor 'A '(Out . P3)) (make-transistor 'B '(P3 . Vss))
+                   (make-transistor 'E '(Out . Vss)) (make-transistor 'D '(Out . P4)) (make-transistor 'C '(P4 . Vss))))
+
 
