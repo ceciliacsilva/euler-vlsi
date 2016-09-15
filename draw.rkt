@@ -120,6 +120,8 @@
                                (lambda(i) (and (equal? (link-point i) id) (link-position i)))
                                points-pud))))
                 (for ((j (in-list nos)))
+                  (displayln pud?)
+                  (displayln j)
                   (match (assoc (car j) line-id)
                     [(list _ p-pol n-pol (line x1 y0 x1 y1 _))
                      (cond [(not pud?) (set! p-pol n-pol)])
@@ -142,10 +144,11 @@
                      (send dc set-brush "black" 'solid)
                      (send dc draw-ellipse
                            (if (zero? (index-of p-pol (cdr j)))
-                                  (- x1 x)
-                                  (+ x1 x))
+                               (- x1 x)
+                               (+ x1 x))
                            y-p-type
-                           6 4)]))                      
+                           6 4)
+                     ]))                      
                 )])
        ]
       [_ #f]) ))

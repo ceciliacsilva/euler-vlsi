@@ -52,8 +52,6 @@
                    (loop (cdr ids) (cons (list id ordem) acc))) )) ]
           [else (reverse acc)]) ))
              
-      
-
 (define (line-hor pud pdn)
   (let-values [((points-pud points-pdn) (points pud pdn))
                ((euler1 euler2) (euler-path pud pdn))]
