@@ -82,8 +82,8 @@
                ((polarity-pud polarity-pdn) (polarity pud pdn))]
     (let* ((qnt-con (length euler2))
            (x  (/ (* 0.8 (size-window-lin size-janela)) qnt-con))
-           (y0 (* 0.2 (size-window-col size-janela)))
-           (y1 (* 0.8 (size-window-col size-janela))))
+           (y0 (* 0.15 (size-window-col size-janela)))
+           (y1 (* 0.85 (size-window-col size-janela))))
       (for/list ((id (in-list euler2)) (i (in-naturals 1)))
         (list id (cadr (assoc id polarity-pud))
               (cadr (assoc id polarity-pdn))
@@ -92,9 +92,9 @@
 (define (line-vout)
   (list
    (make-line
-    (* 0.1 (size-window-lin size-janela))
+    (* 0 (size-window-lin size-janela))
     (* 0.5 (size-window-col size-janela))
-    (* 0.9 (size-window-lin size-janela))
+    (* 1 (size-window-lin size-janela))
     (* 0.5 (size-window-col size-janela))
     "blue")))
 

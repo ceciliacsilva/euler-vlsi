@@ -39,7 +39,7 @@
            (send dc set-brush color 'solid)
            (send dc set-smoothing 'smoothed)
            (send dc draw-line x0 y0 x1 y1)
-           (send dc draw-text "Vout" x1 y1)] ))
+           (send dc draw-text "Vout" (* 0.95 x1)  y1)] ))
       ) ))
 
 (define (draw-other-id line-pud euler2 points-pud line-id x y-p-type [pud? #t])
@@ -106,7 +106,7 @@
                                              (+ x1 x))
                                          y-p-type 6 4)
                                    (send dc draw-ellipse 
-                                         (if (zero? (index-of p-pol node1-p))
+                                         (if (zero? (index-of p-pol2 node2-p))
                                              (- x2 x)
                                              (+ x2 x))
                                          y-p-type 6 4)
@@ -120,8 +120,6 @@
                                (lambda(i) (and (equal? (link-point i) id) (link-position i)))
                                points-pud))))
                 (for ((j (in-list nos)))
-                  (displayln pud?)
-                  (displayln j)
                   (match (assoc (car j) line-id)
                     [(list _ p-pol n-pol (line x1 y0 x1 y1 _))
                      (cond [(not pud?) (set! p-pol n-pol)])
