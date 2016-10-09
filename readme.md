@@ -18,3 +18,6 @@ For exemple:
 	> stick-diagram
 	
 
+	$ cd examples/
+	$ drracket ex1.rkt &
+	$ drracket ex2.rkt &
