@@ -15,23 +15,20 @@
 (define (draw-stick-basic pud pdn)
   (let-values [((line-pud line-pdn) (line-hor pud pdn))
                ((points-pud points-pdn) (points pud pdn))
-               ((euler1 euler2) (euler-path pud pdn))]
-    (let* ((line-id (line-ver pud pdn))
-           (line-out (line-vout))
+               ((euler1 euler2 euler3 euler4) (euler-path pud pdn))
+               ((line-id-pud line-id-pdn) (line-ver pud pdn))]
+    (let* ((line-out (line-vout))
            (qnt-con (length euler2))
+           (eq (equal-pos euler2 euler4))
            (x (/ (* 0.8 (size-window-lin size-janela)) qnt-con 2))
            (y-p-type (line-y0 (cadr (assoc Vout line-pud))))
            (y-n-type (line-y0 (cadr (assoc Vout line-pdn)))))
-      (draw-other-id line-pud euler2 points-pud line-id x y-p-type)
-      (draw-other-id line-pdn euler2 points-pdn line-id x y-n-type #f)
-
-      (for ((i (in-list line-id)))
-        (match i
-          [(list id _ _ (line x0 y0 x1 y1 color))
-           (send dc set-pen color 3 'solid)
-           (send dc set-brush color 'solid)
-           (send dc set-smoothing 'smoothed)
-           (send dc draw-line x1 y0 x1 y1)] ))
+      (draw-id line-id-pud eq #t)
+      (draw-id line-id-pdn eq #f)
+      
+      (draw-other-id line-pud euler2 points-pud line-id-pud x y-p-type)
+      (draw-other-id line-pdn euler2 points-pdn line-id-pdn x y-n-type #f)
+            
       (for ((i (in-list line-out)))
         (match i
           [(line x0 y0 x1 y1 color)
@@ -39,8 +36,19 @@
            (send dc set-brush color 'solid)
            (send dc set-smoothing 'smoothed)
            (send dc draw-line x0 y0 x1 y1)
-           (send dc draw-text "Vout" (* 0.95 x1)  y1)] ))
+           (send dc draw-text "Vout" (* 0.95 x1) y1)] ))
       ) ))
+
+(define (draw-id line-id eq top?)
+  (for ((i (in-list line-id)))
+    (match i
+      [(list id _ (line x0 y0 x1 y1 color))
+       (send dc set-pen color 3 'solid)
+       (send dc set-brush color 'solid)
+       (send dc set-smoothing 'smoothed)
+       (send dc draw-line x1 y0 x1 y1)
+       (cond [(or top? (not (assc id eq)))
+              (send dc draw-text (symbol->string id) x0 (if top? y0 y1))])] )))
 
 (define (draw-other-id line-pud euler2 points-pud line-id x y-p-type [pud? #t])
   (for ((a (in-list line-pud)) (b (in-naturals)))
@@ -68,45 +76,43 @@
                                        (= (sub1 index-node1) index-node2)))
                               (equal? id Vdd) (equal? id Vss))
                              (match (assoc node1 line-id)
-                               [(list _ p-pol n-pol (line x1 y0 x1 y1 _))
+                               [(list _ pol (line x1 y0 x1 y1 _))
                                 (match (assoc node2 line-id)
-                                  [(list _ p-pol2 n-pol2 (line x2 y02 x2 y12 _))
-                                   (cond [(not pud?) (set! p-pol  n-pol)
-                                                     (set! p-pol2 n-pol2)])
+                                  [(list _ pol2 (line x2 y02 x2 y12 _))
                                    (send dc set-pen color 2 'solid)
                                    (send dc set-brush color 'solid)
                                    (send dc set-smoothing 'smoothed)
                                    (send dc draw-lines
                                          (list
                                           (make-object point%
-                                            (if (zero? (index-of p-pol node1-p))
+                                            (if (zero? (index-of pol node1-p))
                                                 (- x1 x)
                                                 (+ x1 x))
                                             y-p-type)
                                           (make-object point%
-                                            (if (zero? (index-of p-pol node1-p))
+                                            (if (zero? (index-of pol node1-p))
                                                 (- x1 x)
                                                 (+ x1 x))
                                             (line-y0 (cadr (assoc id line-pud))))
                                           (make-object point%
-                                            (if (zero? (index-of p-pol2 node2-p))
+                                            (if (zero? (index-of pol2 node2-p))
                                                 (- x2 x)
                                                 (+ x2 x))
                                             (line-y0 (cadr (assoc id line-pud))))
                                           (make-object point%
-                                            (if (zero? (index-of p-pol2 node2-p))
+                                            (if (zero? (index-of pol2 node2-p))
                                                 (- x2 x)
                                                 (+ x2 x))
                                             y-p-type)) )
                                    (send dc set-pen "black" 4 'solid)
                                    (send dc set-brush "black" 'solid)
                                    (send dc draw-ellipse 
-                                         (if (zero? (index-of p-pol node1-p))
+                                         (if (zero? (index-of pol node1-p))
                                              (- x1 x)
                                              (+ x1 x))
                                          y-p-type 6 4)
                                    (send dc draw-ellipse 
-                                         (if (zero? (index-of p-pol2 node2-p))
+                                         (if (zero? (index-of pol2 node2-p))
                                              (- x2 x)
                                              (+ x2 x))
                                          y-p-type 6 4)
@@ -121,27 +127,26 @@
                                points-pud))))
                 (for ((j (in-list nos)))
                   (match (assoc (car j) line-id)
-                    [(list _ p-pol n-pol (line x1 y0 x1 y1 _))
-                     (cond [(not pud?) (set! p-pol n-pol)])
+                    [(list _ pol (line x1 y0 x1 y1 _))
                      (send dc set-pen "blue" 2 'solid)
                      (send dc set-brush "blue" 'solid)
                      (send dc set-smoothing 'smoothed)
                      (send dc draw-lines
                            (list
                             (make-object point%
-                              (if (zero? (index-of p-pol (cdr j)))
+                              (if (zero? (index-of pol (cdr j)))
                                   (- x1 x)
                                   (+ x1 x))
                               y-p-type)
                             (make-object point%
-                              (if (zero? (index-of p-pol (cdr j)))
+                              (if (zero? (index-of pol (cdr j)))
                                   (- x1 x)
                                   (+ x1 x))
                               (* 0.5 (size-window-col size-janela)))) )
                      (send dc set-pen "black" 4 'solid)
                      (send dc set-brush "black" 'solid)
                      (send dc draw-ellipse
-                           (if (zero? (index-of p-pol (cdr j)))
+                           (if (zero? (index-of pol (cdr j)))
                                (- x1 x)
                                (+ x1 x))
                            y-p-type

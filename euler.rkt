@@ -18,7 +18,7 @@
                      (next-vertex (cdr next-step)))
                  (cond ((not (member next-vertex visited))
                         (set! visited (cons next-vertex visited))
-                        (loop (remove-edge next-edge g) next-vertex
+                        (loop (remove-edge next-edge (cons x next-vertex) g) next-vertex
                               (next? g next-vertex))
                         ))
                  ))])
@@ -59,9 +59,18 @@
               [else (values Vdd #t)]) )) ))
 
 (define (euler-path pud pdn)
-  (let-values [((start-ele pud?) (path-start pud pdn))]
-    (cond [pud? (any-path pud start-ele)]
-          [else (any-path pdn start-ele)]) ))
+  (let-values [((start-ele pud?) (path-start pud pdn))
+               ((nodes-pud nodes-pdn) (nodes pud pdn))]
+    (cond [pud?
+           (let-values [((path1 edge1) (any-path pud start-ele))
+                 ((path2 edge2) (any-path pdn (car nodes-pdn)))]
+             (values path1 edge1 path2 edge2))
+           ]
+          [else
+           (let-values [((path1 edge1) (any-path pud (car nodes-pud)))
+                 ((path2 edge2) (any-path pdn start-ele))]
+             (values path1 edge1 path2 edge2))
+           ]) ))
 
 (define (any-path g vertex)
   ;;find path
@@ -71,17 +80,26 @@
         (let ((next-ele
                (if (<= (length (remove-duplicates (flatten (map cdr next)))) 1) 0
                    (for/or [(a (in-list next)) (i (in-naturals))]
-                     (and (<= (reach g vertex) (reach (remove-edge (car a) g) vertex)) i))
+                     (and (<= (reach g vertex) (reach (remove-edge (car a) (cons vertex (cdr a)) g) vertex)) i))
                    )))
-          (let* ((stack (list-ref next next-ele))
-                 (id    (car stack)))
-            (let-values [((euler1 euler2) (any-path (remove-edge id g) (cdr stack)))]
+          (let* ((stack (list-ref next (if next-ele next-ele 0)))
+                 (id    (car stack))
+                 (p2    (cdr stack)))
+            (let-values [((euler1 euler2) (any-path (remove-edge id (cons vertex p2) g) (cdr stack)))]
               (values (cons (make-transistor id (cons vertex (cdr stack)))  euler1)
                       (cons id euler2)))) )) ))
-        
-(define (remove-edge id g)
+
+(define (remove-edge id points g)
+  (let [(g-new (remove-edge2 id points g))]
+    (remove-edge2 id (reverse-pair points) g-new)) )
+  
+(define (remove-edge2 id points g)
   (filter-map (lambda(a)
-                (and (not (or (equal? (transistor-id a) id)
-                              (equal? (transistor-id a) id) )) a ))
-              g) )
+                (and (or (not (equal? (transistor-id a) id))
+                         (not (equal? (transistor-points a) points))) a ))
+                     g) )
+
+(define (reverse-pair points)
+  (cond [(pair? points)
+         (cons (cdr points) (car points))]))
   

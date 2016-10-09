@@ -76,7 +76,13 @@
          (n-list (list-set list1 n1 ele2))
          (f-list (list-set n-list n2 ele1)))
     f-list))
-    
+
+(define (nodes pud pdn)
+  (let [(nodes-pud (remove-duplicates
+                    (flatten (map (lambda(a) (transistor-points a)) pud))))
+        (nodes-pdn (remove-duplicates
+                    (flatten (map (lambda(a) (transistor-points a)) pdn))))]
+    (values nodes-pud nodes-pdn) ))
 
 (define (index-of l x)
   (cond
