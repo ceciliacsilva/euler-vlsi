@@ -2,6 +2,7 @@
 (require racket/draw)
 (require "transistors.rkt" "euler.rkt" "lines.rkt")
 
+(provide stick-diagram draw-stick-basic)
 ;;USE:
 ;;> (draw-stick-basic pud pdn)
 ;;> stick-diagram
@@ -27,7 +28,7 @@
       (draw-id line-id-pdn eq #f)
       
       (draw-other-id line-pud euler2 points-pud line-id-pud x y-p-type)
-      (draw-other-id line-pdn euler2 points-pdn line-id-pdn x y-n-type #f)
+      (draw-other-id line-pdn euler4 points-pdn line-id-pdn x y-n-type #f)
             
       (for ((i (in-list line-out)))
         (match i
@@ -75,10 +76,11 @@
                         [(list _ pol (line x1 y0 x1 y1 _))
                          (match (assoc node2 line-id)
                            [(list _ pol2 (line x2 y02 x2 y12 _))
-                            (cond [(not
-                                    (and (or (= (add1 index-node1) index-node2)
-                                             (= (sub1 index-node1) index-node2))
-                                         (not (= (index-of pol node1-p) (index-of pol node2-p)))))
+                            (cond [(or (not (seguido index-node1 index-node2))
+                                       (and (seguido index-node1 index-node2)
+                                            (not (ligado pol node1-p pol2 node2-p
+                                                         index-node1 index-node2)))
+                                       (equal? id Vdd) (equal? id Vss))
                                    (send dc set-pen color 2 'solid)
                                    (send dc set-brush color 'solid)
                                    (send dc set-smoothing 'smoothed)
@@ -119,8 +121,8 @@
                                    ])])
                          ])
                          ) )
-                  (loop '() aux)]
-                 [(> (length aux) 1) (loop (list (first aux) (second aux)) (cdr aux))]))
+                  (loop '() (cdr aux))]
+                 [(> (length aux) 1) (loop (list (first aux) (second aux)) aux)]))
          )
        (cond [(equal? id Vout)
               (let ((nos (car (filter-map
@@ -156,6 +158,17 @@
                 )])
        ]
       [_ #f]) ))
+
+(define (seguido index-node1 index-node2)
+  (or (= (add1 index-node1) index-node2)
+      (= (sub1 index-node1) index-node2)))
+
+(define (ligado pol node1-p pol2 node2-p index-node1 index-node2)
+  (if (< index-node1 index-node2)
+      (and (= (index-of pol node1-p) 1)
+           (= (index-of pol2 node2-p) 0))
+      (and (= (index-of pol node1-p) 0)
+           (= (index-of pol2 node2-p) 1))) )
 
 (define (index-of l x)
   (cond
