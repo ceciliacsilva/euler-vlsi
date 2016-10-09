@@ -18,7 +18,7 @@
                ((euler1 euler2 euler3 euler4) (euler-path pud pdn))
                ((no-start pud?) (path-start pud pdn))]
     (values (polarity-euler euler1 pud)
-                     (polarity-euler euler3 pdn))
+            (polarity-euler euler3 pdn))
     )
   )
 
